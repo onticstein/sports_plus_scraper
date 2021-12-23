@@ -1,5 +1,6 @@
 # Import Libraries
 import sqlite3
+import re
 from urllib import request
 from bs4 import BeautifulSoup
 
@@ -21,174 +22,123 @@ category = []
 date_time = []
 list_of_list = [title, image_url, category, date_time]
 
-# Main Title
-main_title = soup.find_all("a", {"class": "gnt_m_he gnt_m_he_a"})
-for item in main_title:
-    print(item.text)
-    title.append(item.text)
+# Breaking Story Section
+bs_section = soup.find('a', {'class': 'gnt_m_he gnt_m_he_a'})
 
-# Main Title Image
-main_img = soup.find_all("img", {"class": "gnt_m_he_i"})
-for item in main_img:
-    print(item['src'])
-    image_url.append(item['src'])
+try:
+    bs_title = bs_section.text.strip()
+    title.append(bs_title)
+except:
+    title.append(' ')
 
-# Main Title Category
-main_category = soup.find_all("div", {"class": "gnt_sbt gnt_sbt__ms gnt_sbt__ts gnt_sbt__mg gnt_lbl_pm"})
-if not main_category:
+try:
+    bs_image = bs_section.img['src'].strip()
+    image_url.append(bs_image)
+except:
+    image_url.append(' ')
+
+try:
+    bs_category = bs_section.div['data-c-ms'].strip()
+    category.append(bs_category)
+except:
+    category.append(' ')
+
+try:
+    bs_date_time = bs_section.div['data-c-dt'].strip()
+    date_time.append(bs_date_time)
+except:
+    date_time.append(' ')
+
+# Triplet Section Beneath Breaking Story
+t_section = soup.find_all('a', {'class': 'gnt_m_tl'})
+
+for box in t_section:
+
+    box_divs = box.find_all('div')
+
     try:
-        main_category2 = soup.find_all("div", {"class": "gnt_sbt gnt_sbt__ms gnt_sbt__ts gnt_sbt__mg"})
-        for item in main_category2:
-            print(item['data-c-ms'])
-            category.append(item['data-c-ms'])
+        t_title = box.text.strip()
+        title.append(t_title)
+    except:
+        title.append(' ')
+
+    try:
+        t_image = box.img['src'].strip()
+        image_url.append(t_image)
+    except:
+        image_url.append(' ')
+
+    try:
+        t_category = box_divs[1]['data-c-ms']
+        category.append(t_category)
     except:
         category.append(' ')
-for item in main_category:
-    print(item['data-c-ms'])
-    category.append(item['data-c-ms'])
 
-# Main Title Date Time
-main_datetime = soup.find_all("div", {"class": "gnt_sbt gnt_sbt__ms gnt_sbt__ts gnt_sbt__mg"})
-if not main_datetime:
     try:
-        main_datetime2 = soup.find_all("div", {"class": "gnt_sbt gnt_sbt__ms gnt_sbt__ts gnt_sbt__mg"})
-        for item in main_datetime2:
-            print(item['data-c-dt'])
-            date_time.append(item['data-c-dt'])
+        t_date_time = box_divs[1]['data-c-dt']
+        date_time.append(t_date_time)
     except:
         date_time.append(' ')
-for item in main_datetime:
-    print(item['data-c-dt'])
-    date_time.append(item['data-c-dt'])
 
-# Triplet Titles
-trip_titles = soup.find_all("div", {"class": "gnt_m_tl_c"})
-for item in trip_titles:
-    print(item.text)
-    title.append(item.text)
+# More Stories Section
+ms_section = soup.find_all('a', {'class': 'gnt_m_sl_a'})
 
-# Triplet Images
-trip_imgs = soup.find_all("img", {"class": "gnt_m_tl_i"})
-for item in trip_imgs:
-    print(item['src'])
-    image_url.append(item['src'])
+for box in ms_section:
 
-# Triplet Categories Part 1
-trip_category = soup.find_all("div", {"class": "gnt_sbt gnt_sbt__ms"})
-x = 0
-while x < 1:
-    current_item = trip_category[x]
-    print(current_item['data-c-ms'])
-    category.append(current_item['data-c-ms'])
-    x += 1
+    try:
+        ms_title = box.text.strip()
+        title.append(ms_title)
+    except:
+        title.append(' ')
 
-# Triplet Categories Part 2
-trip_category = soup.find_all("div", {"class": "gnt_sbt gnt_sbt__ms gnt_sbt__ts"})
-for item in trip_category:
-    print(item['data-c-ms'])
-    category.append(item['data-c-ms'])
+    try:
+        ms_image = box.img['data-gl-srcset']
+        image_url.append(ms_image)
+    except:
+        image_url.append(' ')
 
-# Triplet Categories Part 3
-trip_category = soup.find_all("div", {"class": "gnt_sbt gnt_sbt__ms"})
-x = 1
-while x < 2:
-    current_item = trip_category[x]
-    print(current_item['data-c-ms'])
-    category.append(current_item['data-c-ms'])
-    x += 1
+    try:
+        ms_category = box.div['data-c-ms']
+        category.append(ms_category)
+    except:
+        category.append(' ')
 
-# Triplet Date Time EMPTY
-date_time.append(' ')
+    try:
+        ms_date_time = ' '
+        date_time.append(ms_date_time)
+    except:
+        date_time.append(ms_date_time)
 
-# Triplet Date Time
-trip_datetime = soup.find_all("div", {"class": "gnt_sbt gnt_sbt__ms gnt_sbt__ts"})
-for item in trip_datetime:
-    print(item['data-c-dt'])
-    date_time.append(item['data-c-dt'])
+# Additional Stories Section
+regex = re.compile('.*gnt_m_lb_a gnt_m_lb_a__i.*')
 
-# Triplet Date Time EMPTY
-date_time.append(' ')
+as_section = soup.find_all('a', {'class': regex})
 
-# More Stories Titles
-ms_titles = soup.find_all("a", {"class": "gnt_m_sl_a"})
-for item in ms_titles:
-    print(item.text)
-    title.append(item.text)
+for box in as_section:
+    
+    try:
+        as_title = box.text.strip()
+        title.append(as_title)
+    except:
+        title.append(' ')
 
-# More Stories Images
-ms_imgs = soup.find_all("img", {"class": "gnt_m_sl_i"})
-for item in ms_imgs:
-    print(item['data-gl-src'])
-    image_url.append(item['data-gl-src'])
+    try:
+        as_image = box.img['data-gl-srcset']
+        image_url.append(as_image)
+    except:
+        image_url.append(' ')
 
-# More Stories Categories
-ms_category = soup.find_all("div", {"class": "gnt_m_sl_a_sb"})
-for item in ms_category:
-    print(item['data-c-ms'])
-    category.append(item['data-c-ms'])
+    try:
+        as_category = box.div['data-c-ms']
+        category.append(as_category)
+    except:
+        category.append(' ')
 
-# More Stories Date Time
-x = 0
-while x < 6:
-    date_time.append(' ')
-    x += 1
-
-# Additional Stories Titles
-as_title = soup.find_all("a", {"class": "gnt_m_lb_a"})
-for item in as_title:
-    print(item.text)
-    title.append(item.text)
-
-# Additional Stories Images
-as_imgs = soup.find_all("img", {"class": "gnt_m_lb_i"})
-for item in as_imgs:
-    print(item['data-gl-src'])
-    image_url.append(item['data-gl-src'])
-
-# Addition Stories Category Part 1
-as_category = soup.find_all("div", {"class": "gnt_m_lb_sbt gnt_sbt gnt_sbt__ms gnt_sbt__ts"})
-x = 0
-while x < 10:
-    current_item = as_category[x]
-    print(current_item['data-c-ms'])
-    category.append(current_item['data-c-ms'])
-    x += 1
-
-# Addition Stories Category EXCLUSIVE
-as_category = soup.find_all("div", {"class": "gnt_m_lb_sbt gnt_sbt gnt_sbt__ms"})
-for item in as_category:
-    print(item['data-c-ms'])
-    category.append(item['data-c-ms'])
-
-# Addition Stories Category Part 2
-as_category = soup.find_all("div", {"class": "gnt_m_lb_sbt gnt_sbt gnt_sbt__ms gnt_sbt__ts"})
-x = 10
-while x < 20:
-    current_item = as_category[x]
-    print(current_item['data-c-ms'])
-    category.append(current_item['data-c-ms'])
-    x += 1
-
-# Addition Stories Date Time Part 1
-as_datetime = soup.find_all("div", {"class": "gnt_m_lb_sbt gnt_sbt gnt_sbt__ms gnt_sbt__ts"})
-x = 0
-while x < 10:
-    current_item = as_datetime[x]
-    print(current_item['data-c-dt'])
-    date_time.append(current_item['data-c-dt'])
-    x += 1
-
-# Addition Stories Date Time EXCLUSE
-date_time.append(' ')
-
-# Addition Stories Date Time Part 2
-as_datetime = soup.find_all("div", {"class": "gnt_m_lb_sbt gnt_sbt gnt_sbt__ms gnt_sbt__ts"})
-x = 10
-while x < 20:
-    current_item = as_datetime[x]
-    print(current_item['data-c-dt'])
-    date_time.append(current_item['data-c-dt'])
-    x += 1
+    try:
+        as_date_time = box.div['data-c-dt']
+        date_time.append(as_date_time)
+    except:
+        date_time.append(' ')
 
 # DB Data Entry
 def data_entry(main_list):
