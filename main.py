@@ -20,10 +20,6 @@ image_url = []
 category = []
 date_time = []
 list_of_list = [title, image_url, category, date_time]
-list_of_list_names = ["title", "image_url", "category", "date_time"]
-
-# Create Dictionary
-main_dict = {'Title': title, 'Image URL': image_url, 'Category': category, "Date Time": date_time}
 
 # Main Title
 main_title = soup.find_all("a", {"class": "gnt_m_he gnt_m_he_a"})
