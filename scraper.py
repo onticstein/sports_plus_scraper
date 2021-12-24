@@ -164,8 +164,16 @@ def main():
 
 run = True
 while run == True:
-    if __name__ == "__main__":
-        main()
-        print('Data scraped and stored in database successfully...')
-        print('Waiting 4 hours to scrape again...')
-    time.sleep(14400)
+    x = 0
+    while x < 10:
+        try:
+            if __name__ == "__main__":
+                main()
+                print('Data scraped and stored in database successfully...')
+                print('Waiting 4 hours to scrape again...')
+            time.sleep(14400)
+        except:
+            time.sleep(60)
+            x += 1
+    print('Exceeded 10 tries...')
+    break
