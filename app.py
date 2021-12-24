@@ -13,7 +13,7 @@ class Articles(Resource):
         df = df.to_dict(orient='index')
         return {'df': df}, 200
 
-api.add_resource(Articles, '/articles') # '/articles' is our entry point
+api.add_resource(Articles, '/articles')
 
 if __name__ == '__main__':
-    app.run() # run our Flask app
+    app.run()
