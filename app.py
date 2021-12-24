@@ -17,4 +17,3 @@ api.add_resource(Articles, '/articles') # '/articles' is our entry point
 
 if __name__ == '__main__':
     app.run() # run our Flask app
-
